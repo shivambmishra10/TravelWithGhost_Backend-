@@ -5,14 +5,18 @@ frontend/
 *.pyc
 __pycache__/
 db.sqlite3
-.env
 *.log
 
-# Environment
+# Environment files
 .env
 .env.local
+.env.development
+.env.production
 venv/
 env/
+
+# Allow example environment files
+!*.example
 
 # IDE and OS
 .vscode/
