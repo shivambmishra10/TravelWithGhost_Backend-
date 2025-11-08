@@ -1,0 +1,3 @@
+CREATE DATABASE travelwithghost;
+CREATE USER postgres WITH PASSWORD 'TwGh2025#pG9$mK3';
+GRANT ALL PRIVILEGES ON DATABASE travelwithghost TO postgres;

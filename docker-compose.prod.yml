@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - static_files:/app/staticfiles
+      - media_files:/app/media
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+    networks:
+      - app_network
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=travelwithghost
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=TwGh2025PgAdmin
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+      - static_files:/var/www/static
+      - media_files:/var/www/media
+    depends_on:
+      - backend
+    networks:
+      - app_network
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+    depends_on:
+      - nginx
+
+volumes:
+  postgres_data:
+  static_files:
+  media_files:
+
+networks:
+  app_network:
+    driver: bridge

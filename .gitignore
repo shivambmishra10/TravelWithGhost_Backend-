@@ -1,0 +1,21 @@
+# Frontend (separate repository)
+frontend/
+
+# Django & Python
+*.pyc
+__pycache__/
+db.sqlite3
+.env
+*.log
+
+# Environment
+.env
+.env.local
+venv/
+env/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
