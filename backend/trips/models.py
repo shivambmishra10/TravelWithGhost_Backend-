@@ -31,6 +31,7 @@ class Trip(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     description = models.TextField()
+    budget = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Budget per person in INR")
     min_age = models.IntegerField()
     max_age = models.IntegerField()
     required_members = models.IntegerField()

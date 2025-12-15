@@ -97,7 +97,7 @@ class TripSerializer(serializers.ModelSerializer):
         model = Trip
         fields = [
             'id', 'host', 'group_name', 'destination', 'destination_id',
-            'start_date', 'end_date', 'description', 'min_age', 'max_age',
+            'start_date', 'end_date', 'description', 'budget', 'min_age', 'max_age',
             'required_members', 'members', 'itinerary_items', 'current_members_count',
             'created_at'
         ]
@@ -112,7 +112,7 @@ class TripCreateSerializer(serializers.ModelSerializer):
         model = Trip
         fields = [
             'id', 'group_name', 'destination', 'start_date', 'end_date',
-            'description', 'min_age', 'max_age', 'required_members', 'itinerary'
+            'description', 'budget', 'min_age', 'max_age', 'required_members', 'itinerary'
         ]
     
     def create(self, validated_data):
