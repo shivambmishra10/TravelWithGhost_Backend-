@@ -175,3 +175,60 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         
         return user
+
+class GoogleAuthSerializer(serializers.Serializer):
+    """Serializer for Google OAuth authentication."""
+    id_token = serializers.CharField(write_only=True, required=True)
+    
+    def validate_id_token(self, value):
+        """Validate and decode Google ID token."""
+        try:
+            from google.auth.transport import requests
+            from google.oauth2 import id_token
+            
+            # Note: In production, specify the request instance
+            # For development, this should work without specifying clock_skew
+            decoded_token = id_token.verify_oauth2_token(value, requests.Request())
+            
+            return decoded_token
+        except Exception as e:
+            raise serializers.ValidationError(f"Invalid token: {str(e)}")
+    
+    def create(self, validated_data):
+        """Create or get user from Google token data."""
+        decoded_token = validated_data['id_token']
+        
+        email = decoded_token.get('email')
+        first_name = decoded_token.get('given_name', '')
+        last_name = decoded_token.get('family_name', '')
+        picture_url = decoded_token.get('picture', '')
+        
+        if not email:
+            raise serializers.ValidationError("Email not found in Google token.")
+        
+        # Get or create user
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                'username': email.split('@')[0],
+                'first_name': first_name,
+                'last_name': last_name,
+            }
+        )
+        
+        # Update user info if newly created
+        if created:
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+            
+            # Create profile for new user
+            Profile.objects.create(
+                user=user,
+                name=f"{first_name} {last_name}".strip(),
+                current_location="",
+                age=0,
+                gender=""
+            )
+        
+        return user

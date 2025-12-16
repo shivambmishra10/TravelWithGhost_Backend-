@@ -13,6 +13,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('auth/login/', views.CustomObtainAuthToken.as_view(), name='login'),
     path('auth/register/', views.RegisterView.as_view(), name='register'),
+    path('auth/google/', views.GoogleAuthView.as_view(), name='google-auth'),
     path('auth/user/', views.get_user, name='user'),
     path('profile/', views.ProfileViewSet.as_view({'get': 'list', 'post': 'create'}), name='profile'),
     path('create-trip/', views.TripViewSet.as_view({'post': 'create'}), name='create-trip'),

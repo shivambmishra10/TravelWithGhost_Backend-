@@ -12,7 +12,7 @@ from .models import Profile, City, Trip, TripItinerary, JoinRequest, ChatMessage
 from .serializers import (
     UserSerializer, ProfileSerializer, CitySerializer, TripSerializer,
     TripCreateSerializer, JoinRequestSerializer, ChatMessageSerializer,
-    RegisterSerializer
+    RegisterSerializer, GoogleAuthSerializer
 )
 
 class CustomObtainAuthToken(ObtainAuthToken):
@@ -43,6 +43,26 @@ class RegisterView(generics.CreateAPIView):
             'token': token.key,
             'user': UserSerializer(user).data
         }, status=status.HTTP_201_CREATED)
+
+class GoogleAuthView(generics.GenericAPIView):
+    """
+    Google OAuth authentication endpoint.
+    Accepts a Google ID token and returns an auth token and user data.
+    """
+    permission_classes = [AllowAny]
+    serializer_class = GoogleAuthSerializer
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        user = serializer.save()
+        token, created = Token.objects.get_or_create(user=user)
+        
+        return Response({
+            'token': token.key,
+            'user': UserSerializer(user, context={'request': request}).data
+        }, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
